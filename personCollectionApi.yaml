@@ -1,16 +1,22 @@
 openapi: 3.0.3
 info:
-  title: Person Collection API
-  description: REST API для управления коллекцией объектов Person.
+  title: SOA Lab 1
+  description: Вариант 8602. Алексей Волков & Сандов Кирилл.
   version: 1.0.0
+
+tags:
+  - name: Person API
+  - name: Demography API
 
 servers:
   - url: http://localhost:8080
-    description: Сервер Person API
+    description: Dev-сервер
 
 paths:
   /persons:
     get:
+      tags:
+        - Person API
       summary: Получить список всех людей
       description: Поддерживает сортировку, фильтрацию и пагинацию.
       parameters:
@@ -33,6 +39,8 @@ paths:
                 items:
                   $ref: '#/components/schemas/Person'
     post:
+      tags:
+        - Person API
       summary: Добавить нового человека
       requestBody:
         required: true
@@ -50,6 +58,8 @@ paths:
 
   /persons/{id}:
     get:
+      tags:
+        - Person API
       summary: Получить человека по ID
       parameters:
         - name: id
@@ -65,6 +75,8 @@ paths:
                 $ref: '#/components/schemas/Person'
         "404": { description: Не найден }
     put:
+      tags:
+        - Person API
       summary: Обновить человека по ID
       parameters:
         - name: id
@@ -86,6 +98,8 @@ paths:
                 $ref: '#/components/schemas/Person'
         "404": { description: Не найден }
     delete:
+      tags:
+        - Person API
       summary: Удалить человека по ID
       parameters:
         - name: id
@@ -98,6 +112,8 @@ paths:
 
   /persons/average-weight:
     get:
+      tags:
+        - Person API
       summary: Средний вес
       responses:
         "200":
@@ -108,6 +124,8 @@ paths:
 
   /persons/count-by-location:
     get:
+      tags:
+        - Person API
       summary: Количество людей по location
       parameters:
         - name: x
@@ -128,6 +146,8 @@ paths:
 
   /persons/by-height:
     get:
+      tags:
+        - Person API
       summary: Люди выше заданного роста
       parameters:
         - name: minHeight
@@ -142,6 +162,46 @@ paths:
               schema:
                 type: array
                 items: { $ref: '#/components/schemas/Person' }
+
+  /demography/hair-color/{hairColor}:
+    get:
+      tags:
+        - Demography API
+      summary: Количество людей по цвету волос
+      parameters:
+        - name: hairColor
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Количество людей
+          content:
+            application/json:
+              schema: { type: integer }
+
+  /demography/nationality/{nationality}/eye-color/{eyeColor}/percentage:
+    get:
+      tags:
+        - Demography API
+      summary: Доля людей по цвету глаз и национальности
+      parameters:
+        - name: nationality
+          in: path
+          required: true
+          schema:
+            type: string
+            enum: [ RUSSIA, CHINA, INDIA, ITALY, SOUTH_KOREA ]
+        - name: eyeColor
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Процент людей
+          content:
+            application/json:
+              schema: { type: number, format: double }
 
 components:
   schemas:
