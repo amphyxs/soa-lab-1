@@ -1,0 +1,190 @@
+openapi: 3.0.3
+info:
+  title: Person Collection API
+  description: REST API для управления коллекцией объектов Person.
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8080
+    description: Сервер Person API
+
+paths:
+  /persons:
+    get:
+      summary: Получить список всех людей
+      description: Поддерживает сортировку, фильтрацию и пагинацию.
+      parameters:
+        - name: page
+          in: query
+          schema: { type: integer }
+        - name: size
+          in: query
+          schema: { type: integer }
+        - name: sort
+          in: query
+          schema: { type: string }
+      responses:
+        "200":
+          description: Список людей
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Person'
+    post:
+      summary: Добавить нового человека
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PersonCreateRequest'
+      responses:
+        "201":
+          description: Созданный объект
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Person'
+
+  /persons/{id}:
+    get:
+      summary: Получить человека по ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: Найденный человек
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Person'
+        "404": { description: Не найден }
+    put:
+      summary: Обновить человека по ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PersonCreateRequest'
+      responses:
+        "200":
+          description: Обновлённый объект
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Person'
+        "404": { description: Не найден }
+    delete:
+      summary: Удалить человека по ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "204": { description: Удалено }
+        "404": { description: Не найден }
+
+  /persons/average-weight:
+    get:
+      summary: Средний вес
+      responses:
+        "200":
+          description: Среднее значение
+          content:
+            application/json:
+              schema: { type: number, format: double }
+
+  /persons/count-by-location:
+    get:
+      summary: Количество людей по location
+      parameters:
+        - name: x
+          in: query
+          schema: { type: number }
+        - name: y
+          in: query
+          schema: { type: integer }
+        - name: name
+          in: query
+          schema: { type: string }
+      responses:
+        "200":
+          description: Количество найденных
+          content:
+            application/json:
+              schema: { type: integer }
+
+  /persons/by-height:
+    get:
+      summary: Люди выше заданного роста
+      parameters:
+        - name: minHeight
+          in: query
+          required: true
+          schema: { type: number }
+      responses:
+        "200":
+          description: Список найденных людей
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Person' }
+
+components:
+  schemas:
+    Person:
+      type: object
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        coordinates: { $ref: '#/components/schemas/Coordinates' }
+        creationDate: { type: string, format: date-time }
+        height: { type: number }
+        birthday: { type: string, format: date }
+        weight: { type: number, nullable: true }
+        nationality: { $ref: '#/components/schemas/Country' }
+        location: { $ref: '#/components/schemas/Location' }
+
+    PersonCreateRequest:
+      type: object
+      required: [name, coordinates, height, birthday, nationality, location]
+      properties:
+        name: { type: string }
+        coordinates: { $ref: '#/components/schemas/Coordinates' }
+        height: { type: number }
+        birthday: { type: string, format: date }
+        weight: { type: number, nullable: true }
+        nationality: { $ref: '#/components/schemas/Country' }
+        location: { $ref: '#/components/schemas/Location' }
+
+    Coordinates:
+      type: object
+      required: [x, y]
+      properties:
+        x: { type: number }
+        y: { type: number }
+
+    Location:
+      type: object
+      required: [y, name]
+      properties:
+        x: { type: number }
+        y: { type: integer }
+        name: { type: string }
+
+    Country:
+      type: string
+      enum: [RUSSIA, CHINA, INDIA, ITALY, SOUTH_KOREA]

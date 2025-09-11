@@ -1,0 +1,46 @@
+openapi: 3.0.3
+info:
+  title: Demography API
+  description: Дополнительный сервис для статистики по данным Person API.
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8081
+    description: Сервер Demography API
+
+paths:
+  /demography/hair-color/{hairColor}:
+    get:
+      summary: Количество людей по цвету волос
+      parameters:
+        - name: hairColor
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Количество людей
+          content:
+            application/json:
+              schema: { type: integer }
+
+  /demography/nationality/{nationality}/eye-color/{eyeColor}/percentage:
+    get:
+      summary: Доля людей по цвету глаз и национальности
+      parameters:
+        - name: nationality
+          in: path
+          required: true
+          schema:
+            type: string
+            enum: [RUSSIA, CHINA, INDIA, ITALY, SOUTH_KOREA]
+        - name: eyeColor
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Процент людей
+          content:
+            application/json:
+              schema: { type: number, format: double }
